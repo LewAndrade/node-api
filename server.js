@@ -1,15 +1,32 @@
 const http = require("http");
-const { getProducts, getProduct } = require("./controllers/productController");
+const {
+  getProducts,
+  getProduct,
+  createProduct,
+} = require("./controllers/productController");
+const { isProductUrl, containsProductId } = require("./utils");
 
 const server = http.createServer((req, res) => {
-  if (req.url === "/api/products" && req.method === "GET") {
-    getProducts(req, res);
-  } else if (req.url.match(/\/api\/products\/([0-9]+)/)) {
-    const id = req.url.split("/")[3];
-    getProduct(req, res, id);
-  } else {
-    res.writeHead(404, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ message: "Nothing here..." }));
+  if (isProductUrl(req.url)) {
+    switch (req.method) {
+      case "GET":
+        if (!containsProductId(req.url)) {
+          getProducts(req, res);
+        } else {
+          const id = req.url.substr(17, 10);
+          getProduct(req, res, id);
+        }
+        break;
+
+      case "POST":
+        createProduct(req, res);
+        break;
+
+      default:
+        res.writeHead(404, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ message: "Nothing here..." }));
+        break;
+    }
   }
 });
 
