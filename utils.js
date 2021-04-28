@@ -4,7 +4,8 @@ const writeDataToFile = (filename, content) => {
   fs.writeFileSync(filename, JSON.stringify(content), "utf8");
 };
 
-const isProductUrl = (url) => url.match(/\/api\/products/);
+const isProductUrl = (url) =>
+  url.match(/^\/api\/products(\?id=([a-f\d]{10}))?$/);
 
 const containsProductId = (url) =>
   url.match(/^\/api\/products\?id=([a-f\d]{10})$/);
@@ -12,7 +13,7 @@ const containsProductId = (url) =>
 const genId = (len) => crypto.randomBytes(Math.ceil(len / 2)).toString("hex");
 
 const getPostData = (req) => {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     try {
       let body = "";
 

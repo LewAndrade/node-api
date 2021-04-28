@@ -37,19 +37,23 @@ const getProduct = async (req, res, id) => {
 const createProduct = async (req, res) => {
   try {
     const body = await getPostData(req);
+    if (body) {
+      const { title, description, price } = JSON.parse(body);
 
-    const { title, description, price } = JSON.parse(body);
+      const product = {
+        title,
+        description,
+        price,
+      };
 
-    const product = {
-      title,
-      description,
-      price,
-    };
+      const newProduct = await Product.create(product);
 
-    const newProduct = await Product.create(product);
-
-    res.writeHead(201, { "Content-Type": "application/json" });
-    return res.end(JSON.stringify(newProduct));
+      res.writeHead(201, { "Content-Type": "application/json" });
+      return res.end(JSON.stringify(newProduct));
+    } else {
+      res.writeHead(400, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ message: "Invalid JSON" }));
+    }
   } catch (e) {
     console.log(e);
   }
@@ -85,9 +89,30 @@ const updateProduct = async (req, res, id) => {
   }
 };
 
+// @desc  Delete a Product
+// @route DELETE /api/products
+// @query id
+const deleteProduct = async (req, res, id) => {
+  try {
+    const product = await Product.findById(id);
+    if (!product) {
+      res.writeHead(400, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ message: "Product Not Found" }));
+    } else {
+      await Product.remove(id);
+
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ message: `Product ${id} removed` }));
+    }
+  } catch (e) {
+    console.log(e);
+  }
+};
+
 module.exports = {
   getProducts,
   getProduct,
   createProduct,
   updateProduct,
+  deleteProduct,
 };
