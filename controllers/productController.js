@@ -70,19 +70,23 @@ const updateProduct = async (req, res, id) => {
       res.end(JSON.stringify({ message: "Product Not Found" }));
     } else {
       const body = await getPostData(req);
+      if (body) {
+        const { title, description, price } = JSON.parse(body);
 
-      const { title, description, price } = JSON.parse(body);
+        const productData = {
+          title: title || product.title,
+          description: description || product.description,
+          price: price || product.price,
+        };
 
-      const productData = {
-        title: title || product.title,
-        description: description || product.description,
-        price: price || product.price,
-      };
+        const updatedProduct = await Product.update(id, productData);
 
-      const updatedProduct = await Product.update(id, productData);
-
-      res.writeHead(200, { "Content-Type": "application/json" });
-      res.end(JSON.stringify(updatedProduct));
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify(updatedProduct));
+      } else {
+        res.writeHead(400, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ message: "Invalid JSON" }));
+      }
     }
   } catch (e) {
     console.log(e);

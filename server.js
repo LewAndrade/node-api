@@ -11,6 +11,7 @@ const {
   errorBadRequest,
 } = require("./controllers/errorController");
 const { isProductUrl, containsProductId } = require("./utils");
+const PORT = 5000;
 
 const server = http.createServer((req, res) => {
   if (isProductUrl(req.url)) {
@@ -57,7 +58,5 @@ const server = http.createServer((req, res) => {
     errorNotFound(res);
   }
 });
-
-const PORT = process.env.PORT || 5000;
 
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
