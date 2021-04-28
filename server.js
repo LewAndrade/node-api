@@ -3,6 +3,7 @@ const {
   getProducts,
   getProduct,
   createProduct,
+  updateProduct,
 } = require("./controllers/productController");
 const { isProductUrl, containsProductId } = require("./utils");
 
@@ -20,6 +21,13 @@ const server = http.createServer((req, res) => {
 
       case "POST":
         createProduct(req, res);
+        break;
+
+      case "PUT":
+        if (containsProductId(req.url)) {
+          const id = req.url.substr(17, 10);
+          updateProduct(req, res, id);
+        }
         break;
 
       default:
